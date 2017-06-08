@@ -4,7 +4,7 @@ provider "aws" {
 
 /* ============================== SERVERS AND LOAD BALANCERS ============================== */
 
-resource "aws_launch_configuration" "example" {
+resource "aws_launch_configuration" "ec2_launch_template" {
   image_id        = "ami-40d28157"
   instance_type   = "t2.micro"
   security_groups = ["${aws_security_group.allow_all_traffic_on_server_port.id}"]
@@ -22,7 +22,7 @@ resource "aws_launch_configuration" "example" {
 }
 
 resource "aws_autoscaling_group" "example" {
-  launch_configuration = "${aws_launch_configuration.example.id}"
+  launch_configuration = "${aws_launch_configuration.ec2_launch_template.id}"
   availability_zones   = ["${data.aws_availability_zones.all.names}"]
 
   min_size = 2
