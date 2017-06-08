@@ -5,16 +5,16 @@ provider "aws" {
 /* ============================== SERVERS AND LOAD BALANCERS ============================== */
 
 resource "aws_launch_configuration" "ec2_launch_template" {
-  image_id        = "ami-40d28157"
-  instance_type   = "t2.micro"
-  security_groups = ["${aws_security_group.allow_all_traffic_on_server_port.id}"]
+image_id        = "ami-40d28157"
+instance_type   = "t2.micro"
+security_groups = ["${aws_security_group.allow_all_traffic_on_server_port.id}"]
 
 
-  user_data = <<-EOF
-              #!/bin/bash
-              echo "Fuck yeah boys" > index.html
-              nohup busybox httpd -f -p "${var.server_port}" &
-              EOF
+user_data = <<-EOF
+            #!/bin/bash
+            echo "Fuck yeah boys" > index.html
+            nohup busybox httpd -f -p "${var.server_port}" &
+            EOF
 
   lifecycle {
     create_before_destroy = true
@@ -22,11 +22,11 @@ resource "aws_launch_configuration" "ec2_launch_template" {
 }
 
 resource "aws_autoscaling_group" "two_to_ten_autoscaling_setup" {
-  launch_configuration = "${aws_launch_configuration.ec2_launch_template.id}"
-  availability_zones   = ["${data.aws_availability_zones.all.names}"]
+launch_configuration = "${aws_launch_configuration.ec2_launch_template.id}"
+availability_zones   = ["${data.aws_availability_zones.all.names}"]
 
-  min_size = 2
-  max_size = 10
+min_size = 2
+max_size = 10
 
   tag {
     key                 = "Name"
@@ -55,9 +55,9 @@ resource "aws_security_group" "allow_all_traffic_on_server_port" {
   name = "terraform-example-instance"
 
   ingress {
-    from_port = "${var.server_port}"
-    to_port = "${var.server_port}"
-    protocol = "tcp"
+    from_port   = "${var.server_port}"
+    to_port     = "${var.server_port}"
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
