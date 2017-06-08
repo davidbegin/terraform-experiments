@@ -21,7 +21,7 @@ resource "aws_launch_configuration" "ec2_launch_template" {
   }
 }
 
-resource "aws_autoscaling_group" "example" {
+resource "aws_autoscaling_group" "two_to_ten_autoscaling_setup" {
   launch_configuration = "${aws_launch_configuration.ec2_launch_template.id}"
   availability_zones   = ["${data.aws_availability_zones.all.names}"]
 
