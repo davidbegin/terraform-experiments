@@ -33,14 +33,14 @@ resource "aws_autoscaling_group" "autoscaling_setup" {
 
   tag {
     key                 = "Name"
-    value               = "terraform-asg"
+    value               = "begins-asg"
     propagate_at_launch = true
   }
 }
 
 
 resource "aws_elb" "begins_elb" {
-  name               = "terraform-asg"
+  name               = "begins-asg"
   availability_zones = ["${data.aws_availability_zones.all.names}"]
   security_groups    = ["${aws_security_group.elb.id}"]
 
@@ -102,7 +102,7 @@ data "terraform_remote_state" "network" {
   backend = "s3"
   config {
     bucket = "begins_first_terraform_state_bucket"
-    key    = "network/terraform.tfstate"
+    key    = "global/s3/terraform.tfstate"
     region = "us-east-1"
   }
 }
@@ -116,7 +116,7 @@ variable "server_port" {
 
 variable "min_servers" {
   description = "minimum number of servers desired to be running"
-  default     = 3
+  default     = 2
 }
 
 data "aws_availability_zones" "all" {}
