@@ -12,7 +12,7 @@ security_groups = ["${aws_security_group.allow_all_traffic_on_server_port.id}"]
 
 user_data = <<-EOF
             #!/bin/bash
-            echo "Fuck yeah boys" > index.html
+            echo "triggerin new versions" > index.html
             nohup busybox httpd -f -p "${var.server_port}" &
             EOF
 
@@ -21,26 +21,26 @@ user_data = <<-EOF
   }
 }
 
-resource "aws_autoscaling_group" "two_to_ten_autoscaling_setup" {
+resource "aws_autoscaling_group" "autoscaling_setup" {
   launch_configuration = "${aws_launch_configuration.ec2_launch_template.id}"
   availability_zones   = ["${data.aws_availability_zones.all.names}"]
 
   load_balancers    = ["${aws_elb.begins_elb.name}"]
   health_check_type = "ELB"
 
-  min_size = 2
+  min_size = "${var.min_servers}"
   max_size = 10
 
   tag {
     key                 = "Name"
-    value               = "terraform-asg-example"
+    value               = "terraform-asg"
     propagate_at_launch = true
   }
 }
 
 
 resource "aws_elb" "begins_elb" {
-  name               = "terraform-asg-example"
+  name               = "terraform-asg"
   availability_zones = ["${data.aws_availability_zones.all.names}"]
   security_groups    = ["${aws_security_group.elb.id}"]
 
@@ -52,11 +52,11 @@ resource "aws_elb" "begins_elb" {
   }
 
   health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout              = 3
-    interval             = 30
-    target               = "HTTP:${var.server_port}/"
+    healthy_threshold   = "${var.min_servers}"
+    unhealthy_threshold = "${var.min_servers}"
+    timeout             = 3
+    interval            = 30
+    target              = "HTTP:${var.server_port}/"
   }
 }
 
@@ -114,7 +114,16 @@ variable "server_port" {
   default     = 8080
 }
 
+variable "min_servers" {
+  description = "minimum number of servers desired to be running"
+  default     = 3
+}
+
 data "aws_availability_zones" "all" {}
+
+output "s3_bucket_arn" {
+  value = "${data.terraform_remote_state.network.config}"
+}
 
 output "availability_zones" {
   value = "${data.aws_availability_zones.all.names}"
