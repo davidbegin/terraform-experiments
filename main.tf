@@ -96,6 +96,17 @@ resource "aws_security_group" "elb" {
   }
 }
 
+/* ============================== REMOTE STATE SETUP ============================== */
+
+data "terraform_remote_state" "network" {
+  backend = "s3"
+  config {
+    bucket = "begins_first_terraform_state_bucket"
+    key    = "network/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
 /* ============================== VARIABLES, DATA AND OUTPUT ============================== */
 
 variable "server_port" {
